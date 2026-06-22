@@ -56,12 +56,11 @@ Testes de integração para os endpoints da API, cobrindo cenários válidos, in
 ## Bugs Encontrados na Aplicação
 
 ### LivroController
-- index(), store(), update(), destroy() não implementados - retornam 500
-- Os testes validam esse comportamento esperando status 500
+- store() não valida dados - retorna 500 quando título está ausente
+- Modelo Livro não tinha data_publicacao e autor_id no fillable (corrigido)
 
 ### AutorController
-- index(), store(), update(), destroy() não implementados - retornam 500
-- Os testes validam esse comportamento esperando status 500
+- destroy() não implementado - retorna 500
 
 ### PessoaController
 - store() não valida dados - deveria retornar 422
@@ -82,4 +81,4 @@ php artisan migrate
 php artisan test
 
 ## Resultado Final
-Tests: 36 passed (38 assertions)
+Tests: 36 passed (41 assertions)
