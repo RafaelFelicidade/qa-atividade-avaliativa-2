@@ -9,6 +9,7 @@ use Tests\TestCase;
 class UsersTest extends TestCase
 {
     use RefreshDatabase;
+    
 
     // ✅ TESTE 1: Listar users
     public function test_listar_users(): void

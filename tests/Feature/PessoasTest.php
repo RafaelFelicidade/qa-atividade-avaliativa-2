@@ -11,6 +11,7 @@ use Tests\TestCase;
 class PessoasTest extends TestCase
 {
     use RefreshDatabase;
+   
 
     private function criarBiblioteca()
     {

@@ -10,6 +10,7 @@ use App\Models\Biblioteca;
 class BibliotecasTest extends TestCase
 {
     use RefreshDatabase;
+  
 
     // Cria um usuário para usar nos testes
     private function criarUsuario()

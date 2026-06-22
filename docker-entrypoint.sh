@@ -4,6 +4,7 @@ set -e
 echo "Aguardando MySQL estar pronto..."
 sleep 10
 
+cp .env.example .env
 echo "Instalando dependências do Composer..."
 composer install --no-interaction
 
