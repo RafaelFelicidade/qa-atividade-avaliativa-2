@@ -13,9 +13,6 @@ services:
     volumes:
       - ./init-db:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
-    networks:
-      app-network:
-        ipv4_address: 172.200.0.2
 
   app:
     build:
@@ -34,17 +31,7 @@ services:
     depends_on:
       - mysql
     entrypoint: /app/docker-entrypoint.sh
-    networks:
-      app-network:
-        ipv4_address: 172.200.0.3
 
 volumes:
   mysql_data:
 
-networks:
-  app-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.200.0.0/24
-          gateway: 172.200.0.1

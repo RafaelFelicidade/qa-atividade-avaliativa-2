@@ -30,6 +30,12 @@ class LivroController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'isbn' => 'required|string|max:50',
+            'autor_id' => 'required|exists:autores,id',
+            'data_publicacao' => 'nullable|date',
+        ]);
 
         $livro = new Livro();
         $livro->autor_id = $request->input('autor_id');
@@ -42,7 +48,7 @@ class LivroController extends Controller
 
     public function edit(Request $request, $id)
     {
-        $livro = Livro::find($id);
+        $livro = Livro::findOrFail($id);
         $autores = Autor::all();
         return view('livros.edit', compact('livro', 'autores'));
     }
@@ -50,6 +56,14 @@ class LivroController extends Controller
     public function update(Request $request, $id)
     {
         $livro = Livro::findOrFail($id);
+
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'isbn' => 'required|string|max:50',
+            'autor_id' => 'required|exists:autores,id',
+            'data_publicacao' => 'nullable|date',
+        ]);
+
         $livro->autor_id = $request->input('autor_id');
         $livro->titulo = $request->input('titulo');
         $livro->isbn = $request->input('isbn');

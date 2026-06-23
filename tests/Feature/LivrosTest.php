@@ -35,8 +35,8 @@ class LivrosTest extends TestCase
         $response = $this->post('/livros', [
             'isbn' => '123',
         ]);
-        // BUG: LivroController não valida dados, retorna 500
-        $response->assertStatus(500);
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['titulo']);
     }
 
     public function test_atualizar_livro(): void

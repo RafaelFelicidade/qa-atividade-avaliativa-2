@@ -44,6 +44,9 @@ docker exec -it app_laravel bash
 XDEBUG_MODE=coverage /usr/bin/php8.4 artisan test --coverage
 ```
 
+### Resultado dos Testes
+![Print de Cobertura dos Testes](./print_testes.png)
+
 
 
 

@@ -48,14 +48,14 @@ class PessoasTest extends TestCase
         $this->assertDatabaseHas('pessoas', ['name' => 'Pessoa Teste']);
     }
 
-    // ⚠️ TESTE 3: Criar pessoa sem nome — BUG: controller não valida, gera erro 500
+    // TESTE 3: Criar pessoa sem nome — Deve falhar na validação e redirecionar de volta com erros
     public function test_criar_pessoa_sem_nome(): void
     {
         $response = $this->post('/pessoas', [
             'email' => 'pessoa@teste.com',
         ]);
-        // BUG IDENTIFICADO: controller não valida dados, deveria retornar 422
-        $response->assertStatus(500);
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['name']);
     }
 
     // ✅ TESTE 4: Atualizar pessoa existente
@@ -75,15 +75,14 @@ class PessoasTest extends TestCase
         $this->assertDatabaseHas('pessoas', ['name' => 'Pessoa Atualizada']);
     }
 
-    // ⚠️ TESTE 5: Atualizar pessoa inexistente — BUG: redireciona em vez de 404
+    // TESTE 5: Atualizar pessoa inexistente — Deve retornar 404
     public function test_atualizar_pessoa_inexistente(): void
     {
         $response = $this->put('/pessoas/9999', ['name' => 'Qualquer']);
-        // BUG IDENTIFICADO: controller redireciona (302) em vez de retornar 404
-        $response->assertStatus(302);
+        $response->assertStatus(404);
     }
 
-    // ⚠️ TESTE 6: Deletar pessoa existente — BUG: método destroy está vazio
+    // TESTE 6: Deletar pessoa existente — Deve deletar com sucesso
     public function test_deletar_pessoa(): void
     {
         $biblioteca = $this->criarBiblioteca();
@@ -93,16 +92,15 @@ class PessoasTest extends TestCase
             'email'         => 'deletar@teste.com',
             'password'      => bcrypt('senha123'),
         ]);
-        $this->delete("/pessoas/{$pessoa->id}");
-        // BUG IDENTIFICADO: método destroy está vazio, pessoa não é deletada
-        $this->assertDatabaseHas('pessoas', ['id' => $pessoa->id]);
+        $response = $this->delete("/pessoas/{$pessoa->id}");
+        $response->assertRedirect('/pessoas');
+        $this->assertDatabaseMissing('pessoas', ['id' => $pessoa->id]);
     }
 
-    // ⚠️ TESTE 7: Deletar pessoa inexistente — BUG: retorna 200 em vez de 404
+    // TESTE 7: Deletar pessoa inexistente — Deve retornar 404
     public function test_deletar_pessoa_inexistente(): void
     {
         $response = $this->delete('/pessoas/9999');
-        // BUG IDENTIFICADO: retorna 200 em vez de 404
-        $response->assertStatus(200);
+        $response->assertStatus(404);
     }
 }

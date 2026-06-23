@@ -29,15 +29,15 @@ class UsersTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'user@teste.com']);
     }
 
-    // ⚠️ TESTE 3: Criar user sem email — BUG: não valida, redireciona em vez de 422
+    // TESTE 3: Criar user sem email — Deve falhar na validação e redirecionar de volta com erros
     public function test_criar_user_sem_email(): void
     {
         $response = $this->post('/users', [
             'name'     => 'User Teste',
             'password' => 'senha123',
         ]);
-        // BUG IDENTIFICADO: controller não valida dados, redireciona (302) em vez de 422
         $response->assertStatus(302);
+        $response->assertSessionHasErrors(['email']);
     }
 
     // ✅ TESTE 4: Atualizar user existente
@@ -56,12 +56,11 @@ class UsersTest extends TestCase
         $this->assertDatabaseHas('users', ['name' => 'User Atualizado']);
     }
 
-    // ⚠️ TESTE 5: Atualizar user inexistente — BUG: redireciona em vez de 404
+    // TESTE 5: Atualizar user inexistente — Deve retornar 404
     public function test_atualizar_user_inexistente(): void
     {
         $response = $this->put('/users/9999', ['name' => 'Qualquer']);
-        // BUG IDENTIFICADO: controller redireciona (302) em vez de retornar 404
-        $response->assertStatus(302);
+        $response->assertStatus(404);
     }
 
     // ✅ TESTE 6: Deletar user existente
@@ -72,15 +71,15 @@ class UsersTest extends TestCase
             'email'    => 'deletar@teste.com',
             'password' => bcrypt('senha123'),
         ]);
-        $this->delete("/users/{$user->id}");
+        $response = $this->delete("/users/{$user->id}");
+        $response->assertRedirect('/users');
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
     }
 
-    // ⚠️ TESTE 7: Deletar user inexistente — BUG: redireciona em vez de 404
+    // TESTE 7: Deletar user inexistente — Deve retornar 404
     public function test_deletar_user_inexistente(): void
     {
         $response = $this->delete('/users/9999');
-        // BUG IDENTIFICADO: controller redireciona (302) em vez de retornar 404
-        $response->assertStatus(302);
+        $response->assertStatus(404);
     }
 }

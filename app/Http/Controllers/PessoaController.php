@@ -21,6 +21,11 @@ class PessoaController extends Controller
     }
 
     public function store(Request $request){
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:pessoas,email',
+            'password' => 'required|min:6',
+        ]);
 
         $pessoa = new Pessoa();
         $pessoa->name = $request->input('name');
@@ -35,23 +40,26 @@ class PessoaController extends Controller
         }
 
         $pessoa->save();
+
+        if ($request->has('biblioteca_id')) {
+            $pessoa->bibliotecas()->syncWithoutDetaching([$request->input('biblioteca_id')]);
+        }
+
         return redirect()->route('pessoas.index')->with('message', 'Pessoa criada com sucesso!');
     }
 
     public function edit($id) {
-        $pessoa = Pessoa::find($id);
-        if (!$pessoa) {
-            return redirect()->route('pessoas.index')->with('error', 'Pessoa não encontrada');
-        }
+        $pessoa = Pessoa::findOrFail($id);
         return view('pessoas.edit', compact('pessoa'));
     }
 
     public function update(Request $request, $id) {
+        $pessoa = Pessoa::findOrFail($id);
 
-        $pessoa = Pessoa::find($id);
-        if (!$pessoa) {
-            return redirect()->route('pessoas.index')->with('error', 'Pessoa não encontrada');
-        }
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:pessoas,email,' . $id,
+        ]);
 
         $pessoa->name = $request->input('name');
         $pessoa->email = $request->input('email');
@@ -78,7 +86,9 @@ class PessoaController extends Controller
     }
 
     public function destroy($id) {
-
+        $pessoa = Pessoa::findOrFail($id);
+        $pessoa->delete();
+        return redirect()->route('pessoas.index')->with('message', 'Pessoa excluída com sucesso!');
     }   
 
 

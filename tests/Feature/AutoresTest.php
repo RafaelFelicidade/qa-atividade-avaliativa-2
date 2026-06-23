@@ -56,14 +56,13 @@ class AutoresTest extends TestCase
             'email' => 'deletar@teste.com',
         ]);
         $response = $this->delete("/autores/{$autor->id}");
-        // BUG: AutorController::destroy() não implementado
-        $response->assertStatus(500);
+        $response->assertRedirect('/autores');
+        $this->assertDatabaseMissing('autores', ['id' => $autor->id]);
     }
 
     public function test_deletar_autor_inexistente(): void
     {
         $response = $this->delete('/autores/9999');
-        // BUG: AutorController::destroy() não implementado
-        $response->assertStatus(500);
+        $response->assertStatus(404);
     }
 }

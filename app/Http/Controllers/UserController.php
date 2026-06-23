@@ -16,10 +16,7 @@ class UserController extends Controller
 
     public function show($id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return redirect()->route('users.index')->with('error', 'Usuário não encontrado');
-        }
+        $user = User::findOrFail($id);
         return view('users.show', compact('user'));
     }
 
@@ -30,6 +27,12 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+        ]);
+
         $name = $request->input('name');
         $email = $request->input('email');
         $password = bcrypt($request->input('password'));
@@ -49,19 +52,18 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return redirect()->route('users.index')->with('error', 'Usuário não encontrado');
-        }
+        $user = User::findOrFail($id);
         return view('users.edit', compact('user'));
     }
 
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return redirect()->route('users.index')->with('error', 'Usuário não encontrado');
-        }
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+        ]);
 
         $name = $request->input('name');
         $email = $request->input('email');
@@ -81,10 +83,7 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return redirect()->route('users.index')->with('error', 'Usuário não encontrado');
-        }
+        $user = User::findOrFail($id);
 
         try {
             $user->delete();
